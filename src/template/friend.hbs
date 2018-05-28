@@ -1,0 +1,13 @@
+{{#each items}}
+<li class="list__item">
+    <div class="item__photo">
+        <img src="{{photo_100}}" alt="фото друга" class="item__img">
+    </div>
+    <div class="item__title">{{first_name}} {{last_name}}</div>
+    <div class="item__btn item__btn--add">
+        <a href="#" class="btn__link">
+            <img src="src/img/add-gray.png" alt="" class="ibtn__img" data-id={{id}}>
+        </a>
+    </div>
+</li>
+{{/each}}

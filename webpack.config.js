@@ -39,7 +39,7 @@ module.exports = {
             title: 'Friends',
             template: 'friends.hbs',
             filename: 'friends.html',
-            chunks: ['friends']
+            chunks: ['index']
         }),
         new CleanWebpackPlugin(['dist'])
     ]

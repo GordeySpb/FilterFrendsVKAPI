@@ -3,8 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>{{htmlWebpackPlugin.options.title}}</title>
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:300,500&amp;subset=cyrillic,cyrillic-ext" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/normolize.css">
+    <link rel="stylesheet" href="src/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.js"></script>
+    <script src="http://vk.com/js/api/openapi.js" type="text/javascript"></script>
 </head>
 <body>
+    <div class="wrapper">
+        <div class="wrapper__logo">
+            <img src="src/img/logo.png" alt="Другофильтр" class="logo__img">
+        </div>
+        <div class="container">
+            <div class="filter__wpar">
+                <div class="header__row">
+                    <div class="filter__title">Выберете друзей</div>
+                    <div class="filter__close">
+                        <a href="#" class="close__link">
+                            <img src="src/img/close-white.png" alt="Закрыть" class="close__img">
+                        </a>
+                    </div>
+                </div>
 
+                <div class="serch__row">
+                    <input type="text" id="serch-left" class="serch-input" placeholder="Начните вводить имя друга">
+                    <input type="text" id="serch-right"class="serch-input" placeholder="Название">
+                </div>
+
+                <div class="frends__row">
+                    <div class="frends__block frends__block--left">
+                        <div class="frends__title frends__title--left">Ваши друзья</div>
+                        <ul class="list" id="list-left">
+                            
+                        </ul>
+                    </div>
+
+                    <div class="frends__block frends__right">
+                        <div class="frends__title frends__title--right">Друзья в списке</div>
+                        <ul class="list" id="list-right">
+                            
+                        </ul>
+                    </div>
+                </div>
+                <div class="friends__buttons">
+                    <button class="friends__btn" id="save-btn">Сохранить</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="src/index.js"></script> 
 </body>
 </html>
