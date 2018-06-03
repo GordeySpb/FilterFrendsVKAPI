@@ -1,13 +1,21 @@
 {{#each items}}
-<li class="list__item">
+<li class="list__item" draggable="true"  data-id={{id}}>
     <div class="item__photo">
         <img src="{{photo_100}}" alt="фото друга" class="item__img">
     </div>
     <div class="item__title">{{first_name}} {{last_name}}</div>
+    {{#if ../selected}}
+    <div class="item__btn item__btn--close">
+        <a href="#" class="btn__link">
+            <img src="src/img/close-gray.png" alt="" class="ibtn__img ibtn__img--delete" data-id={{id}}>
+        </a>
+    </div>  
+    {{else}}
     <div class="item__btn item__btn--add">
         <a href="#" class="btn__link">
-            <img src="src/img/add-gray.png" alt="" class="ibtn__img" data-id={{id}}>
+            <img src="src/img/add-gray.png" alt="" class="ibtn__img ibtn__img--add" data-id={{id}}>
         </a>
-    </div>
+    </div>  
+    {{/if}}
 </li>
 {{/each}}

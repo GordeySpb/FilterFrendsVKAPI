@@ -4,23 +4,19 @@ import render from './template/friend.hbs';
 
 const save = document.getElementById('save-btn');
 
-//левый инпут
-
-const serchLeft = document.getElementById('serch-left');
-
-//правый инпут 
-
-const serchRight = document.getElementById('serch-right');
-
 //левый лист
 
 const listLeft = document.getElementById('list-left');
+
+//список с друзьями
+
+const listFriends = document.querySelector('.frends__row');
 
 //правый лист
 
 const listRight = document.getElementById('list-right');
 
-const addBtn = document.querySelector('.item__btn--add');
+const inputs = document.querySelector('.serch__row');
 
 //левый список друзей
 
@@ -30,13 +26,22 @@ let friendsLeft;
 
 let friendsRight = [];
 
+let friendsLeftItems = [];
+
+let currentDrag;
+
+
+
+
+
+
 
 
 
 
 //инициализация приложения
 VK.init({
-    apiId: 6492796
+    apiId: 6497221
 });
 
 //авторизация
@@ -78,26 +83,181 @@ const callAPI = (method, params) => {
         });
 
         //сохраняем массив друзей
-        let friendsLeftItems = friendsLeft.items;
+        friendsLeftItems = friendsLeft.items;
         const html = render(friendsLeft);
         listLeft.innerHTML = html;
 
-        listLeft.addEventListener('click', e => {
+        if (localStorage.left || localStorage.right) {
+
+            let left = JSON.parse(localStorage.left);
+            let right = JSON.parse(localStorage.right);
+
+
+            listLeft.innerHTML = render(left);
+            listRight.innerHTML = render({
+                items: right,
+                selected: true
+            });
+        }
+
+        listFriends.addEventListener('click', e => {
             e.preventDefault();
 
-            if (!(e.target.classList.contains('ibtn__img'))) return
 
             //получение id текущего друга
             const friendId = e.target.getAttribute('data-id');
 
+            if (e.target.classList.contains('ibtn__img--add')) {
+                
+                
+                const rightInput = document.getElementById('serch-right');
+                const rightInputValue = rightInput.value;
+
+                if (rightInputValue === '') {      
+                    listRight.innerHTML = render({
+                        items: friendsRight,
+                        selected: true
+                    });
+                } else {
+                    let sortArrFriendRight = sortName(friendsRight, rightInputValue);
+                    listRight.innerHTML = render({
+                        items: sortArrFriendRight,
+                        selected: true
+                    });
+ 
+                }
+                //добавление выбранных друзей в массив
+                addFriend(friendsLeftItems, friendId);
+
+                //рендеринг левого списка
+                listLeft.innerHTML = render(friendsLeft);
+                
+            }
+
+             
+
+            if (e.target.classList.contains('ibtn__img--delete')) {
+                //удаление друга
+                deleteFrendFromList(friendsRight, friendId);
+                //рендеринг правого списка
+                    listRight.innerHTML = render({
+                    items: friendsRight,
+                    selected: true
+                });
+
+
+            }
+
+
+        });
 
 
 
+        inputs.addEventListener('keyup', e => {
+            e.preventDefault()
+
+            if (e.target.classList.contains('serch-input--left')) {
+                //значение с импута
+                const inputValue = e.target.value;
+                //отсортированный список
+                let sortArrFriendLeft = sortName(friendsLeftItems, inputValue)
 
 
-            addFriend(friendsLeftItems, friendId)
-            console.log(friendsRight)
+
+                //отображение отсортированных друзей в левом списке
+                listLeft.innerHTML = render({
+                    items: sortArrFriendLeft
+                });
+
+
+
+            }
+
+            if (e.target.classList.contains('serch-input--right')) {
+                //значение с импута
+                const inputValue = e.target.value;
+                //отсортированный список
+                let sortArrFriendRight = sortName(friendsRight, inputValue)
+
+                //отображение отсортированных друзей в левом списке
+                listRight.innerHTML = render({
+                    items: sortArrFriendRight,
+                    selected: true
+                });
+            }
+
+
         })
+
+
+        save.addEventListener('click', e => {
+            e.preventDefault();
+
+            saveToLocalStorage(friendsLeft, friendsRight)
+        })
+
+        //DnD
+
+        listFriends.addEventListener('click', e => {
+            if (e.target.classList.contains('list__item')) {
+                const zone = getCurrentZone(e.target);
+            }
+        });
+
+        listFriends.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'IMG') return
+
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('Text', e.target.getAttribute('data-id'));
+
+            const zone = getCurrentZone(e.target);
+
+            if (zone) {
+                currentDrag = {
+                    startZone: zone,
+                    node: e.target
+                };
+            }
+        });
+
+        listFriends.addEventListener('dragover', (e) => {
+            const zone = getCurrentZone(e.target);
+
+            if (zone) {
+                e.preventDefault();
+            }
+        });
+
+        listFriends.addEventListener('drop', (e) => {
+            let friendId = e.dataTransfer.getData('Text');
+
+            if (currentDrag) {
+                const zone = getCurrentZone(e.target);
+
+                e.preventDefault();
+
+                if (zone && currentDrag.startZone !== zone) {
+                    if (e.target.classList.contains('list__item')) {
+                        zone.insertBefore(currentDrag.node, e.target.nextElementSibling);
+
+                    } else {
+                        zone.insertBefore(currentDrag.node, zone.lastElementChild);
+                    }
+
+                    addFriend(friendsLeftItems, friendId)
+
+                    listRight.innerHTML = render({
+                        items: friendsRight,
+                        selected: true
+                    });
+
+                }
+
+
+                currentDrag = null;
+            }
+
+        });
 
     } catch (e) {
         console.error(e);
@@ -111,23 +271,74 @@ function isMatching(full, chunk) {
     full = full.toLowerCase();
     chunk = chunk.toLowerCase();
 
+    return (full.indexOf(chunk) + 1) ? true : false
+};
 
-    if (full.indexOf(chunk) + 1) {
-        return true
-    } else {
-        return false
-    }
+function sortName(array, val) {
+    let sortsArr = [];
+
+    array.forEach(elem => {
+        //получение полного имени
+        const fullName = `${elem.first_name} ${elem.last_name}`;
+
+        if (isMatching(fullName, val)) {
+            sortsArr.push(elem);
+        }
+    })
+
+    return sortsArr;
 
 };
 
-//добавление друга
+//добавление друга в правый лист и удаление из левого
 
 function addFriend(friends, id) {
+
     friends.forEach(element => {
-        if (element.id === id) {
+
+        if (element.id === Number(id)) {
             friendsRight.push(element)
-        }
+
+            let elementIndex = friends.indexOf(element);
+            let removedFriends = friends.splice(elementIndex, 1)
+
+        };
+
     });
 
 };
 
+//удаление друга из списка
+
+function deleteFrendFromList(friends, id) {
+
+    friends.forEach(element => {
+        if (element.id === Number(id)) {
+            friendsLeftItems.push(element);
+            let elementIndex = friends.indexOf(element);
+
+            //удаленный друг
+            let removedFriends = friends.splice(elementIndex, 1)
+        }
+
+    })
+};
+
+function saveToLocalStorage(left, right) {
+    localStorage.left = JSON.stringify(left);
+    localStorage.right = JSON.stringify(right);
+
+    alert('Друзья сохранены');
+};
+
+
+
+function getCurrentZone(from) {
+    do {
+        if (from.classList.contains('list')) {
+            return from;
+        }
+    } while (from = from.parentElement);
+
+    return null;
+}
