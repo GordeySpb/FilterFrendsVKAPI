@@ -238,7 +238,11 @@ const callAPI = (method, params) => {
                 if (zone && currentDrag.startZone !== zone) {
                     if (currentDrag.startZone.id === 'list-left') {
 
+<<<<<<< HEAD
                         addFriend(friendsLeftItems, friendsRight, friendId);
+=======
+                        addFriend(friendsLeftItems,friendsRight, friendId);
+>>>>>>> 348c97fc895745dd72a6637dfd0463f9f903dbfb
 
                     }
 
