@@ -237,13 +237,6 @@ const callAPI = (method, params) => {
 
                 if (zone && currentDrag.startZone !== zone) {
                     if (currentDrag.startZone.id === 'list-left') {
-                        // if (e.target.classList.contains('list__item')) {
-                        //     zone.insertBefore(currentDrag.node, e.target.nextElementSibling);
-
-                        // } else {
-                        //     zone.insertBefore(currentDrag.node, zone.lastElementChild);
-                        // }
-
 
                         addFriend(friendsLeftItems,friendsRight, friendId);
 
