@@ -104,7 +104,7 @@ const callAPI = (method, params) => {
                 const rightInput = document.getElementById('serch-right');
                 const rightInputValue = rightInput.value;
                 //добавление выбранных друзей в массив
-                addFriend(friendsLeftItems,friendsRight, friendId);
+                addFriend(friendsLeftItems, friendsRight, friendId);
 
                 if (rightInputValue === '') {
                     listRight.innerHTML = render({
@@ -237,29 +237,42 @@ const callAPI = (method, params) => {
 
                 if (zone && currentDrag.startZone !== zone) {
                     if (currentDrag.startZone.id === 'list-left') {
-                        // if (e.target.classList.contains('list__item')) {
-                        //     zone.insertBefore(currentDrag.node, e.target.nextElementSibling);
 
-                        // } else {
-                        //     zone.insertBefore(currentDrag.node, zone.lastElementChild);
-                        // }
-
-
-                        addFriend(friendsLeftItems,friendsRight, friendId);
+                        addFriend(friendsLeftItems, friendsRight, friendId);
 
                     }
 
                     if (currentDrag.startZone.id === 'list-right') {
-                        addFriend(friendsRight,friendsLeftItems, friendId)
+                        
+                        let rightInput = document.getElementById('serch-right');
+                        console.log(rightInput)
+                        let rightInputValue = rightInput.value;
+                        
+
+                        addFriend(friendsRight, friendsLeftItems, friendId);
+  
+
+                        if (rightInputValue === '') {
+                            listRight.innerHTML = render({
+                                items: friendsRight,
+                                selected: true
+                            });
+                        }else {
+                            let sortArrFriendRight = sortName(friendsRight, rightInputValue);
+
+                            listRight.innerHTML = render({
+                                items: sortArrFriendRight,
+                                selected: true
+                            });
+                        }
+
+                        
                     }
 
-
-
-
-                    listRight.innerHTML = render({
-                        items: friendsRight,
-                        selected: true
-                    });
+                    // listRight.innerHTML = render({
+                    //     items: friendsRight,
+                    //     selected: true
+                    // });
 
 
                     listLeft.innerHTML = render({
@@ -267,7 +280,6 @@ const callAPI = (method, params) => {
                     });
 
                 }
-
 
                 currentDrag = null;
             }
@@ -307,7 +319,7 @@ function sortName(array, val) {
 
 //добавление друга в правый лист и удаление из левого
 
-function addFriend(from, to,  id) {
+function addFriend(from, to, id) {
 
     from.forEach(element => {
 
@@ -322,22 +334,6 @@ function addFriend(from, to,  id) {
     });
 
 };
-
-// function addFriendRight(friends, id) {
-
-//     friends.forEach(element => {
-
-//         if (element.id === Number(id)) {
-//             friendsLeftItems.push(element)
-
-//             let elementIndex = friends.indexOf(element);
-//             let removedFriends = friends.splice(elementIndex, 1)
-
-//         };
-
-//     });
-
-// };
 
 
 
