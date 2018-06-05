@@ -1,4 +1,6 @@
 import render from './template/friend.hbs';
+import './css/normolize.css';
+import './css/main.css';
 
 // кнопка сохранения
 
