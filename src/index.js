@@ -33,7 +33,7 @@ let currentDrag;
 
 //инициализация приложения
 VK.init({
-    apiId: 6497221
+    apiId: 6499732
 });
 
 //авторизация
@@ -76,20 +76,25 @@ const callAPI = (method, params) => {
 
         //сохраняем массив друзей
         friendsLeftItems = friendsLeft.items;
-        const html = render(friendsLeft);
+        const html = render({
+            items:friendsLeftItems
+        });
         listLeft.innerHTML = html;
 
         if (localStorage.left || localStorage.right) {
 
-            let left = JSON.parse(localStorage.left);
-            let right = JSON.parse(localStorage.right);
+            friendsLeftItems = JSON.parse(localStorage.left);
+            friendsRight = JSON.parse(localStorage.right);
 
 
-            listLeft.innerHTML = render(left);
+            listLeft.innerHTML = render({
+                items: friendsLeftItems
+            });
             listRight.innerHTML = render({
-                items: right,
+                items: friendsRight,
                 selected: true
             });
+
         }
 
         listFriends.addEventListener('click', e => {
@@ -120,7 +125,9 @@ const callAPI = (method, params) => {
 
                 }
                 //рендеринг левого списка
-                listLeft.innerHTML = render(friendsLeft);
+                listLeft.innerHTML = render({
+                    items: friendsLeftItems
+                });
 
             }
 
@@ -130,7 +137,7 @@ const callAPI = (method, params) => {
                 let leftInputValue = leftInput.value;
 
                 //удаление друга
-                deleteFrendFromList(friendsRight, friendId);
+                deleteFrendFromList(friendsRight, friendsLeftItems, friendId);
 
                 if (leftInputValue === '') {
                     //рендеринг левого списка
@@ -192,7 +199,7 @@ const callAPI = (method, params) => {
         save.addEventListener('click', e => {
             e.preventDefault();
 
-            saveToLocalStorage(friendsLeft, friendsRight)
+            saveToLocalStorage(friendsLeftItems, friendsRight)
         })
 
         //DnD
@@ -238,23 +245,12 @@ const callAPI = (method, params) => {
                 if (zone && currentDrag.startZone !== zone) {
                     if (currentDrag.startZone.id === 'list-left') {
 
-<<<<<<< HEAD
-                        addFriend(friendsLeftItems, friendsRight, friendId);
-=======
-                        addFriend(friendsLeftItems,friendsRight, friendId);
->>>>>>> 348c97fc895745dd72a6637dfd0463f9f903dbfb
-
-                    }
-
-                    if (currentDrag.startZone.id === 'list-right') {
-                        
                         let rightInput = document.getElementById('serch-right');
-                        console.log(rightInput)
                         let rightInputValue = rightInput.value;
-                        
 
-                        addFriend(friendsRight, friendsLeftItems, friendId);
-  
+                        
+                        addFriend(friendsLeftItems, friendsRight, friendId);
+
 
                         if (rightInputValue === '') {
                             listRight.innerHTML = render({
@@ -270,18 +266,39 @@ const callAPI = (method, params) => {
                             });
                         }
 
-                        
+                        listLeft.innerHTML = render({
+                            items: friendsLeftItems
+                        });
+
                     }
 
-                    // listRight.innerHTML = render({
-                    //     items: friendsRight,
-                    //     selected: true
-                    // });
+                    
 
+                    if (currentDrag.startZone.id === 'list-right') {
+                        let leftInput = document.getElementById('serch-left');
+                        let leftInputValue = leftInput.value;
 
-                    listLeft.innerHTML = render({
-                        items: friendsLeftItems
-                    });
+                        
+                        addFriend(friendsRight, friendsLeftItems, friendId);
+
+                        if(leftInputValue === '') {
+                            listLeft.innerHTML = render({
+                                items: friendsLeftItems
+                            });
+                        }else {
+                            let sortArrFriendsLeft = sortName(friendsLeftItems, leftInputValue);
+
+                            listLeft.innerHTML = render({
+                                items: sortArrFriendsLeft
+                            })
+                        }
+
+                        listRight.innerHTML = render({
+                            items: friendsRight,
+                            selected: true
+                        })
+  
+                    }
 
                 }
 
@@ -343,15 +360,15 @@ function addFriend(from, to, id) {
 
 //удаление друга из списка
 
-function deleteFrendFromList(friends, id) {
+function deleteFrendFromList(from, to, id) {
 
-    friends.forEach(element => {
+    from.forEach(element => {
         if (element.id === Number(id)) {
-            friendsLeftItems.push(element);
-            let elementIndex = friends.indexOf(element);
+            to.push(element);
+            let elementIndex = from.indexOf(element);
 
             //удаленный друг
-            let removedFriends = friends.splice(elementIndex, 1)
+            let removedFriends = from.splice(elementIndex, 1)
         }
 
     })
