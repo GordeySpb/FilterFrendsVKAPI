@@ -1,4 +1,4 @@
-## LoftSchool example project
+## Учебный проект с использованием VK API
 
 ### Доступные команды
 
